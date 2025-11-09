@@ -1,13 +1,14 @@
+
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { QuizItem } from '../types';
 
+// FIX: Switched from import.meta.env.VITE_API_KEY to process.env.API_KEY to follow coding guidelines and resolve TypeScript error.
 if (!process.env.API_KEY) {
-  // In a Vite project, environment variables are accessed via import.meta.env
-  // However, for Vercel, process.env is polyfilled, so we keep this check.
-  // We'll rely on Vercel's environment variable configuration.
+  throw new Error("API_KEY environment variable not set. Please add it to your .env file or Vercel project settings.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const QUIZ_PROMPT = `
 أنت خبير في كرة القدم. أنشئ سؤالاً واحداً صعبًا ومثيرًا للاهتمام حول كرة القدم.
@@ -76,8 +77,14 @@ export async function fetchQuizItem(): Promise<QuizItem> {
     },
   });
 
-  const rawJson = textResponse.text.trim();
-  const quizContent = JSON.parse(rawJson);
+  const rawJson = textResponse.text;
+  
+  if (!rawJson) {
+    console.error("API Error: Received empty text response.", textResponse);
+    throw new Error("Received an empty response from the Gemini API.");
+  }
+
+  const quizContent = JSON.parse(rawJson.trim());
 
   console.log("Generated quiz content:", quizContent);
 

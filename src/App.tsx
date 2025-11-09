@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+
+import React, { useState, useCallback } from 'react';
 import { GameState, QuizItem } from './types';
 import { fetchQuizItem } from './services/geminiService';
 import QuestionCard from './components/QuestionCard';
